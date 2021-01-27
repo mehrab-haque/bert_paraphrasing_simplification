@@ -1,14 +1,18 @@
 from transformers import pipeline
-f = open("res/1-1000.txt", "r")
-words=f.read().splitlines()
+import textstat
 
 nlp = pipeline("fill-mask")
-preds = nlp(f"I am exhausted, it's a {nlp.tokenizer.mask_token} task.")
+preds = nlp(f"I am excited, it's a {nlp.tokenizer.mask_token} topic.")
+
+new_sentences=[]
+ease_levels=[]
+
 for p in preds:
-    if str(nlp.tokenizer.decode([p['token']])).strip() in words:
-        print('Found Replacement')
-        print("original : I am exhausted, it's a **** task.")
-        print("simplified : I am exhasuted, it's a "+str(nlp.tokenizer.decode([p['token']])).strip()+" task.")
-        break
+    s = "I am excited, it's a " + str(nlp.tokenizer.decode([p['token']])).strip() + " topic."
+    new_sentences.append(s)
+    ease_levels.append(float(textstat.flesch_reading_ease(s)))
+
+print("original sentence : I am excited, it's a **** topic.")
+print("simplified sentence : "+new_sentences[ease_levels.index(min(ease_levels))])
 
 
